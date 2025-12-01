@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Crowd Density Monitor - Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Switched to 'Outfit' for a more modern, tech-focused style -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            /* Updated Font Family */
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a; /* Fallback */
+        }
+        
+        /* Canvas Background */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle Border Shine Animation */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg);
+            animation: shine 8s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        /* Staggered Entrance Animations */
+        .animate-enter {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Input Field Animations */
+        .input-group input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .input-group input:focus + i {
+            color: #60a5fa;
+        }
+
+        /* Floating Label Logic (Optional visual flare) */
+        .input-highlight {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        .input-group:focus-within .input-highlight {
+            width: 100%;
+        }
+
+        /* Panel Transitions */
+        .hidden-panel {
+            display: none;
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        .visible-panel {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Button Shimmer Hover */
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        .btn-shimmer:hover::after {
+            left: 100%;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center overflow-hidden text-white">
+
+    <!-- Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Main Container -->
+    <main class="relative z-10 flex w-full max-w-6xl h-[85vh] glass-card rounded-3xl mx-4 shadow-2xl animate-enter">
+        
+        <!-- Left Side: Brand & Info -->
+        <div class="hidden md:flex flex-col justify-between w-5/12 bg-slate-900/40 p-12 border-r border-white/5 backdrop-blur-sm relative overflow-hidden">
+            <!-- Decorative blurred orb -->
+            <div class="absolute -top-20 -left-20 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 right-0 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10">
+                <div class="flex items-center gap-4 mb-10 animate-enter delay-100">
+                    <div class="p-3 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/20 ring-1 ring-white/10">
+                        <i data-lucide="scan-eye" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <!-- Increased text size -->
+                    <h1 class="text-3xl font-bold tracking-wide">CrowdGuard AI</h1>
+                </div>
+                
+                <!-- Increased Heading Size significantly -->
+                <h2 class="text-4xl md:text-5xl font-bold leading-tight mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-blue-200 animate-enter delay-200">
+                    Real-Time Crowd Analytics & Safety
+                </h2>
+                <!-- Increased paragraph size -->
+                <p class="text-slate-300 text-lg leading-relaxed mb-10 animate-enter delay-300 font-light">
+                    Advanced YOLOv8 computer vision algorithms process live feeds to detect density anomalies and trigger intelligent alerts instantly.
+                </p>
+                
+                <div class="space-y-6 mt-4 animate-enter delay-400">
+                    <div class="flex items-center gap-5 group">
+                        <div class="p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 group-hover:border-green-500/50 transition-colors">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-green-400"></i>
+                        </div>
+                        <span class="text-lg text-slate-200 group-hover:text-white transition-colors">Automated Threat Detection</span>
+                    </div>
+                    <div class="flex items-center gap-5 group">
+                        <div class="p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 group-hover:border-blue-500/50 transition-colors">
+                            <i data-lucide="activity" class="w-6 h-6 text-blue-400"></i>
+                        </div>
+                        <span class="text-lg text-slate-200 group-hover:text-white transition-colors">Live Density Heatmaps</span>
+                    </div>
+                    <div class="flex items-center gap-5 group">
+                        <div class="p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 group-hover:border-red-500/50 transition-colors">
+                            <i data-lucide="bell-ring" class="w-6 h-6 text-red-400"></i>
+                        </div>
+                        <span class="text-lg text-slate-200 group-hover:text-white transition-colors">Role-Based Emergency Alerts</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-sm text-slate-500 relative z-10 animate-enter delay-400">
+                &copy; 2024 CrowdGuard Analytics. v2.0.1
+            </div>
+        </div>
+
+        <!-- Right Side: Forms -->
+        <div class="w-full md:w-7/12 relative bg-slate-950/30 p-8 md:p-14 flex flex-col justify-center overflow-y-auto backdrop-blur-md">
+            
+            <!-- Navigation Tabs: Larger text -->
+            <div class="absolute top-8 right-8 flex bg-slate-900/60 rounded-full p-1.5 border border-white/10 animate-enter delay-100">
+                <button onclick="switchTab('login')" id="tab-login" class="px-8 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-500/25">Login</button>
+                <button onclick="switchTab('signup')" id="tab-signup" class="px-8 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider text-slate-400 hover:text-white transition-all duration-300">Sign Up</button>
+            </div>
+
+            <!-- Notification Toast -->
+            <div id="notification" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-8 py-4 rounded-xl shadow-2xl z-50 transition-all duration-500 opacity-0 translate-y-[-30px] pointer-events-none flex items-center gap-4">
+                <div class="bg-green-500/20 p-1.5 rounded-full">
+                    <i data-lucide="check" class="w-5 h-5 text-green-400"></i>
+                </div>
+                <span id="notification-msg" class="font-medium text-base tracking-wide">Operation Successful</span>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="login-panel" class="visible-panel w-full max-w-md mx-auto mt-12 md:mt-0">
+                <div class="animate-enter delay-200">
+                    <h3 class="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Welcome Back</h3>
+                    <p class="text-slate-400 text-base mb-10">Secure login to monitoring dashboard.</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-7 animate-enter delay-300">
+                    <!-- Role Selector: Increased Size -->
+                    <div class="bg-slate-900/60 p-2 rounded-2xl flex justify-between border border-white/5 shadow-inner">
+                        <button type="button" onclick="selectLoginRole('admin')" class="role-btn flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-xl text-center transition-all duration-300 bg-slate-700 text-white shadow-md" data-role="admin">Admin</button>
+                        <button type="button" onclick="selectLoginRole('security')" class="role-btn flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-xl text-center text-slate-500 hover:text-slate-300 transition-all duration-300" data-role="security">Security</button>
+                        <button type="button" onclick="selectLoginRole('planner')" class="role-btn flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-xl text-center text-slate-500 hover:text-slate-300 transition-all duration-300" data-role="planner">Planner</button>
+                    </div>
+                    <input type="hidden" id="login-role" value="admin">
+
+                    <div class="space-y-5">
+                        <div class="space-y-2 input-group relative">
+                            <label class="text-sm font-bold uppercase text-slate-400 tracking-wider ml-1">Email Identifier</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i data-lucide="fingerprint" class="h-6 w-6 text-slate-600 transition-colors duration-300"></i>
+                                </div>
+                                <!-- Increased padding and font size for inputs -->
+                                <input type="email" required class="w-full bg-slate-900/50 border border-slate-700/50 text-white text-base rounded-xl block w-full pl-12 p-4 placeholder-slate-600 outline-none transition-all duration-300 hover:border-slate-600" placeholder="user@crowdguard.ai">
+                                <div class="input-highlight"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 input-group relative">
+                            <label class="text-sm font-bold uppercase text-slate-400 tracking-wider ml-1">Access Key</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i data-lucide="key-round" class="h-6 w-6 text-slate-600 transition-colors duration-300"></i>
+                                </div>
+                                <input type="password" required class="w-full bg-slate-900/50 border border-slate-700/50 text-white text-base rounded-xl block w-full pl-12 p-4 placeholder-slate-600 outline-none transition-all duration-300 hover:border-slate-600" placeholder="••••••••">
+                                <div class="input-highlight"></div>
+                            </div>
+                            <div class="flex justify-end">
+                                <a href="#" class="text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium">Reset Credentials?</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-shimmer w-full text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 focus:ring-4 focus:outline-none focus:ring-blue-800 font-bold rounded-xl text-lg px-6 py-4 text-center shadow-lg shadow-blue-900/40 transition-all transform hover:scale-[1.01] hover:shadow-blue-600/25 mt-4">
+                        Initialize Dashboard
+                    </button>
+                </form>
+            </div>
+
+            <!-- SIGNUP FORM -->
+            <div id="signup-panel" class="hidden-panel w-full max-w-md mx-auto mt-12 md:mt-0">
+                <div class="animate-enter delay-200">
+                    <h3 class="text-3xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">New Node Registration</h3>
+                    <p class="text-slate-400 text-base mb-8">Join the surveillance network.</p>
+                </div>
+
+                <form onsubmit="handleSignup(event)" class="space-y-5 animate-enter delay-300">
+                    <div class="flex gap-5">
+                        <div class="w-1/2 space-y-2 input-group relative">
+                            <label class="text-xs font-bold uppercase text-slate-400 tracking-wider">Full Name</label>
+                            <input type="text" required class="w-full bg-slate-900/50 border border-slate-700/50 text-white text-base rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3.5 outline-none transition-all" placeholder="Jane Doe">
+                            <div class="input-highlight"></div>
+                        </div>
+                        <div class="w-1/2 space-y-2 relative">
+                            <label class="text-xs font-bold uppercase text-slate-400 tracking-wider">Assignment</label>
+                            <div class="relative">
+                                <select id="signup-role" class="appearance-none w-full bg-slate-900/50 border border-slate-700/50 text-white text-base rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3.5 outline-none transition-all cursor-pointer">
+                                    <option value="admin">System Admin</option>
+                                    <option value="security">Security Staff</option>
+                                    <option value="planner">Event Planner</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 input-group relative">
+                        <label class="text-xs font-bold uppercase text-slate-400 tracking-wider">Email</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-lucide="mail" class="h-5 w-5 text-slate-600 group-focus-within:text-blue-400 transition-colors"></i>
+                            </div>
+                            <input type="email" required class="w-full bg-slate-900/50 border border-slate-700/50 text-white text-base rounded-xl focus:ring-blue-500 focus:border-blue-500 pl-11 p-3.5 outline-none transition-all" placeholder="name@agency.com">
+                            <div class="input-highlight"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 input-group relative">
+                        <label class="text-xs font-bold uppercase text-slate-400 tracking-wider">Password</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-lucide="lock" class="h-5 w-5 text-slate-600 group-focus-within:text-blue-400 transition-colors"></i>
+                            </div>
+                            <input type="password" required class="w-full bg-slate-900/50 border border-slate-700/50 text-white text-base rounded-xl focus:ring-blue-500 focus:border-blue-500 pl-11 p-3.5 outline-none transition-all" placeholder="••••••••">
+                            <div class="input-highlight"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start pt-3">
+                        <div class="flex items-center h-5">
+                            <input id="terms" type="checkbox" required class="w-5 h-5 border border-slate-600 rounded bg-slate-700 focus:ring-3 focus:ring-blue-600 ring-offset-gray-800 cursor-pointer">
+                        </div>
+                        <label for="terms" class="ml-3 text-sm font-medium text-slate-400">Confirm <a href="#" class="text-blue-400 hover:underline hover:text-blue-300">Data Privacy Protocol</a>.</label>
+                    </div>
+
+                    <button type="submit" class="btn-shimmer w-full text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 focus:ring-4 focus:outline-none focus:ring-cyan-800 font-bold rounded-xl text-lg px-6 py-4 text-center shadow-lg shadow-cyan-900/40 transition-all transform hover:scale-[1.01]">
+                        Register Credentials
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- Canvas Background Animation (The "Neural Network/Crowd" Effect) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        // Configuration for the animation
+        const particleCount = 80; // Number of nodes
+        const connectionDistance = 120; // Distance to connect nodes
+        const mouseDistance = 200; // Mouse interaction radius
+
+        let mouse = { x: null, y: null };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        window.addEventListener('resize', resize);
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1.5; // Velocity X
+                this.vy = (Math.random() - 0.5) * 1.5; // Velocity Y
+                this.size = Math.random() * 2 + 1;
+                this.color = Math.random() > 0.5 ? '#3b82f6' : '#6366f1'; // Blue or Indigo
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                // Mouse Interaction (Run away slightly)
+                if (mouse.x != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    if (distance < mouseDistance) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouseDistance - distance) / mouseDistance;
+                        const directionX = forceDirectionX * force * 2; // Push strength
+                        const directionY = forceDirectionY * force * 2;
+                        this.x -= directionX;
+                        this.y -= directionY;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Update and Draw Particles
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Draw Connections
+                for (let j = i; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        let opacity = 1 - (distance / connectionDistance);
+                        ctx.strokeStyle = 'rgba(100, 116, 139, ' + opacity * 0.3 + ')'; // Slate-500 with opacity
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Start Animation
+        resize();
+        initParticles();
+        animate();
+
+
+        // --- UI Interaction Logic ---
+
+        // State Management
+        const loginPanel = document.getElementById('login-panel');
+        const signupPanel = document.getElementById('signup-panel');
+        const loginTab = document.getElementById('tab-login');
+        const signupTab = document.getElementById('tab-signup');
+        const roleInput = document.getElementById('login-role');
+
+        // Switch between Login and Signup
+        function switchTab(tab) {
+            if (tab === 'login') {
+                loginPanel.classList.remove('hidden-panel');
+                loginPanel.classList.add('visible-panel');
+                signupPanel.classList.add('hidden-panel');
+                signupPanel.classList.remove('visible-panel');
+
+                // Update Buttons
+                loginTab.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
+                loginTab.classList.remove('text-slate-400');
+                signupTab.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
+                signupTab.classList.add('text-slate-400');
+            } else {
+                signupPanel.classList.remove('hidden-panel');
+                signupPanel.classList.add('visible-panel');
+                loginPanel.classList.add('hidden-panel');
+                loginPanel.classList.remove('visible-panel');
+
+                // Update Buttons
+                signupTab.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
+                signupTab.classList.remove('text-slate-400');
+                loginTab.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
+                loginTab.classList.add('text-slate-400');
+            }
+        }
+
+        // Handle Role Selection on Login Page
+        function selectLoginRole(role) {
+            roleInput.value = role;
+            const buttons = document.querySelectorAll('.role-btn');
+            buttons.forEach(btn => {
+                if (btn.dataset.role === role) {
+                    btn.classList.add('bg-slate-700', 'text-white', 'shadow-md');
+                    btn.classList.remove('text-slate-500');
+                } else {
+                    btn.classList.remove('bg-slate-700', 'text-white', 'shadow-md');
+                    btn.classList.add('text-slate-500');
+                }
+            });
+        }
+
+        // Show Notification Function
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const msgText = document.getElementById('notification-msg');
+            
+            msgText.textContent = message;
+            notification.style.opacity = '1';
+            notification.style.transform = 'translate(-50%, 0)';
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translate(-50%, -30px)';
+            }, 3000);
+        }
+
+        // API CONFIGURATION
+        const API_URL = 'http://localhost:5000/api';
+
+        // Handle Login (Connected to MongoDB)
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            // Get Form Data
+            const form = e.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+            const role = roleInput.value; // From the hidden input
+            
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            
+            // Loading State
+            btn.innerHTML = `<span class="flex items-center justify-center gap-2"><svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Authenticating...</span>`;
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, role })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 1. SAVE USER DATA
+                    localStorage.setItem('crowdGuardUser', JSON.stringify(data.user));
+
+                    showNotification(data.message);
+                    btn.innerText = "Redirecting...";
+                    
+                    // 2. REDIRECT TO DASHBOARD
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    showNotification(data.message); 
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification("Connection failed. Is the server running?");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Handle Signup (Connected to MongoDB)
+        async function handleSignup(e) {
+            e.preventDefault();
+
+            // Get Form Data
+            const form = e.target;
+            const fullName = form.querySelector('input[placeholder="Jane Doe"]').value;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+            const roleSelect = document.getElementById('signup-role');
+            const role = roleSelect.value;
+            const roleName = roleSelect.options[roleSelect.selectedIndex].text;
+
+             const btn = form.querySelector('button[type="submit"]');
+             const originalText = btn.innerText;
+             
+             btn.innerHTML = `<span class="flex items-center justify-center gap-2"><svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Registering Node...</span>`;
+             btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, email, password, role })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`User ${roleName} created successfully.`);
+                    btn.innerText = "Success";
+                    setTimeout(() => {
+                        switchTab('login');
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        form.reset(); // Clear form
+                    }, 1000);
+                } else {
+                    showNotification(data.message); // Show error (e.g., email exists)
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification("Connection failed. Is the server running?");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

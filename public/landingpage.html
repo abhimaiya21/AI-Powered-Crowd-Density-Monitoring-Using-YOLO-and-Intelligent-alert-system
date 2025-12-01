@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrowdGuard AI - Intelligent Monitoring System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #020617;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 80%);
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .glass-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Text Gradients */
+        .text-gradient {
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .text-gradient-blue {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Glow Effects */
+        .glow-blob {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Background -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 border-b border-white/5 glass">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-500/20">
+                    <i data-lucide="scan-eye" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="text-xl font-bold tracking-wide">CrowdGuard AI</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+                <a href="#features" class="hover:text-white transition-colors">Features</a>
+                <a href="#how-it-works" class="hover:text-white transition-colors">Methodology</a>
+                <a href="#tech-stack" class="hover:text-white transition-colors">Tech Stack</a>
+            </div>
+            <a href="login.html" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all border border-white/10">
+                Login to Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-40 pb-32 px-6">
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold mb-8 fade-up">
+                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                v2.0 System Live: Case Study Deployment
+            </div>
+            
+            <h1 class="text-6xl md:text-7xl font-bold leading-tight mb-8 fade-up">
+                <span class="text-gradient">Predicting Crowd Risks</span><br>
+                <span class="text-gradient-blue">Before They Happen.</span>
+            </h1>
+            
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed fade-up">
+                An AI-powered surveillance framework leveraging <strong>YOLOv8</strong> for real-time crowd density estimation, anomaly detection, and intelligent role-based alerting.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 fade-up">
+                <a href="index.html" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/25 transition-all transform hover:scale-105 flex items-center justify-center gap-2">
+                    Launch Live Monitor
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </a>
+                <a href="#features" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all border border-slate-700 flex items-center justify-center gap-2">
+                    View Features
+                    <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Floating Abstract UI Element -->
+        <div class="mt-20 max-w-5xl mx-auto glass rounded-2xl border border-white/10 p-2 fade-up shadow-2xl">
+            <div class="bg-slate-950/50 rounded-xl aspect-video w-full flex items-center justify-center relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950 z-10"></div>
+                <!-- Mock UI Graphic -->
+                <div class="text-center z-20">
+                     <i data-lucide="video" class="w-16 h-16 text-slate-600 mx-auto mb-4 opacity-50"></i>
+                     <p class="text-slate-500 font-mono text-sm">LIVE FEED SIMULATION ACTIVE</p>
+                </div>
+                <!-- Grid Overlay -->
+                <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+                
+                <!-- Animated Bounding Boxes (Visual Flair) -->
+                <div class="absolute top-1/3 left-1/4 w-24 h-32 border-2 border-green-500 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div class="absolute -top-6 left-0 bg-green-500 text-black text-xs font-bold px-1">Person 98%</div>
+                </div>
+                <div class="absolute bottom-1/4 right-1/3 w-24 h-32 border-2 border-green-500 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
+                     <div class="absolute -top-6 left-0 bg-green-500 text-black text-xs font-bold px-1">Person 95%</div>
+                </div>
+                 <div class="absolute top-1/2 right-1/4 w-24 h-32 border-2 border-red-500 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-200">
+                     <div class="absolute -top-6 left-0 bg-red-500 text-white text-xs font-bold px-1">Density Alert</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 px-6 relative">
+        <div class="glow-blob left-[-200px] top-[100px]"></div>
+        
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-4xl font-bold mb-4">Core Intelligence Capabilities</h2>
+                <p class="text-slate-400 text-lg">Designed for high-stakes environments like concerts, protests, and transport hubs.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass glass-card p-8 rounded-3xl fade-up">
+                    <div class="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="box-select" class="w-7 h-7 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">YOLOv8 Detection</h3>
+                    <p class="text-slate-400 leading-relaxed">State-of-the-art object detection model tuned for human recognition in dense crowds, ensuring accurate head-counts even with occlusion.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass glass-card p-8 rounded-3xl fade-up" style="transition-delay: 100ms;">
+                    <div class="w-14 h-14 bg-orange-500/20 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="flame" class="w-7 h-7 text-orange-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Density Heatmaps</h3>
+                    <p class="text-slate-400 leading-relaxed">Visualizes congestion zones in real-time using color-coded gradients. Instantly identify bottlenecks before they become dangerous.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass glass-card p-8 rounded-3xl fade-up" style="transition-delay: 200ms;">
+                    <div class="w-14 h-14 bg-red-500/20 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="siren" class="w-7 h-7 text-red-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Role-Based Alerts</h3>
+                    <p class="text-slate-400 leading-relaxed">Intelligent routing of notifications. Security gets tactical alerts, Admins get system stats, and Planners receive flow data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology / How it Works -->
+    <section id="how-it-works" class="py-24 px-6 bg-slate-900/30 border-y border-white/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="fade-up">
+                    <h2 class="text-4xl font-bold mb-6">The Architecture</h2>
+                    <div class="space-y-8">
+                        <div class="flex gap-6">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center font-bold text-blue-400">1</div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Input Stream</h4>
+                                <p class="text-slate-400">CCTV feeds or prerecorded video footage are ingested into the system pipeline.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-6">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center font-bold text-blue-400">2</div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Frame Processing</h4>
+                                <p class="text-slate-400">Frames are resized and passed through the YOLOv8 Neural Network for bounding box regression.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-6">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center font-bold text-blue-400">3</div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Logic & Alerting</h4>
+                                <p class="text-slate-400">Count data is compared against safety thresholds. If density > threshold, alerts are triggered via API.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative fade-up">
+                    <!-- Diagram representation -->
+                    <div class="glass p-8 rounded-3xl border border-dashed border-slate-700 relative overflow-hidden">
+                         <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
+                         
+                         <div class="space-y-4 font-mono text-sm text-slate-300">
+                             <div class="bg-black/40 p-4 rounded-lg border-l-4 border-green-500">
+                                 <span class="text-green-400">INPUT:</span> video_feed_01.mp4
+                             </div>
+                             <div class="flex justify-center"><i data-lucide="arrow-down" class="w-5 h-5 text-slate-600"></i></div>
+                             <div class="bg-black/40 p-4 rounded-lg border-l-4 border-blue-500">
+                                 <span class="text-blue-400">PROCESS:</span> model.predict(source, conf=0.5)
+                             </div>
+                             <div class="flex justify-center"><i data-lucide="arrow-down" class="w-5 h-5 text-slate-600"></i></div>
+                             <div class="bg-black/40 p-4 rounded-lg border-l-4 border-red-500 flex justify-between items-center">
+                                 <span><span class="text-red-400">OUTPUT:</span> Density Warning (High)</span>
+                                 <span class="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded">ALERT SENT</span>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech-stack" class="py-20 px-6">
+        <div class="max-w-4xl mx-auto text-center fade-up">
+            <p class="text-slate-500 uppercase tracking-widest text-sm font-bold mb-8">Powered By Best-in-Class Technology</p>
+            <div class="flex flex-wrap justify-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Simple Text Logos for Tech Stack -->
+                <div class="flex items-center gap-2">
+                    <i data-lucide="box" class="w-6 h-6"></i> <span class="font-bold text-xl">YOLOv8</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="code-2" class="w-6 h-6"></i> <span class="font-bold text-xl">Python 3.9</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="cpu" class="w-6 h-6"></i> <span class="font-bold text-xl">OpenCV</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="layout" class="w-6 h-6"></i> <span class="font-bold text-xl">Tailwind</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Footer -->
+    <footer class="py-12 px-6 border-t border-white/5 bg-slate-900/50 text-center">
+        <div class="fade-up">
+            <h2 class="text-3xl font-bold mb-6">Ready to secure your venue?</h2>
+            <a href="dashboard.html" class="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition-colors">
+                Access System Dashboard
+                <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+            </a>
+            <p class="mt-8 text-slate-600 text-sm">&copy; 2024 CrowdGuard Analytics Case Study. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // --- Canvas Animation (Reused for consistency) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        const particleCount = 60; // Slightly less dense for landing page
+        const connectionDistance = 150;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5; // Slower movement
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                this.color = Math.random() > 0.5 ? '#3b82f6' : '#6366f1';
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                for (let j = i; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(100, 116, 139, ${0.15 * (1 - dist/connectionDistance)})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        initParticles();
+        animate();
+
+        // --- Scroll Animations ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-up').forEach((el) => observer.observe(el));
+    </script>
+</body>
+</html>
