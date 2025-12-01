@@ -1,0 +1,87 @@
+### Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# Build directories
+dist/
+build/
+.next/
+out/
+
+### Environment
+.env
+.env.*.local
+
+### Logs
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+### OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+### Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+.pytest_cache/
+
+### Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+### Machine Learning / Model artifacts
+# common model checkpoints and weights
+*.pt
+*.pth
+*.ckpt
+*.weights
+*.h5
+models/
+model/
+checkpoints/
+
+### Data & outputs
+data/
+dataset/
+datasets/
+output/
+outputs/
+results/
+runs/
+logs/
+wandb/
+mlruns/
+
+### Misc
+coverage/
+.cache/
+tmp/
+temp/
+*.tmp
+*.swp
+npm-debug.log*
+yarn.lock
+
+### Docker
+docker-compose.override.yml
+
+### GitHub Actions
+.github/workflows/*.yml
