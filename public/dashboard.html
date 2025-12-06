@@ -151,41 +151,24 @@
                     </div>
                 </div>
 
-                <!-- Right Side: Alert Feed -->
-                <div class="glass-panel rounded-2xl flex flex-col">
-                    <div class="p-4 border-b border-white/5">
-                        <h3 class="font-bold text-sm">Recent Anomalies</h3>
+                <!-- Right Side: Alert Feed (Dynamic) -->
+                <div class="glass-panel rounded-2xl flex flex-col h-full">
+                    <div class="p-4 border-b border-white/5 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-sm">Recent Anomalies</h3>
+                            <span id="sync-status" class="text-[10px] text-slate-500 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-slate-600"></span> Connecting...
+                            </span>
+                        </div>
+                        <!-- A temporary button to simulate new alerts coming in -->
+                        <button onclick="simulateAlert()" class="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-slate-300 transition">
+                            + Simulate
+                        </button>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-4 space-y-3">
-                        <!-- Alert Item -->
-                        <div class="flex gap-3 items-start p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                            <i data-lucide="octagon-alert" class="w-5 h-5 text-red-400 mt-0.5"></i>
-                            <div>
-                                <h4 class="text-sm font-semibold text-red-200">High Density Detected</h4>
-                                <p class="text-xs text-red-300/70 mt-1">Sector A (North Gate) exceeded threshold of 3.0 p/m².</p>
-                                <span class="text-[10px] text-slate-500 mt-2 block">Just now</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Alert Item -->
-                        <div class="flex gap-3 items-start p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                            <i data-lucide="footprints" class="w-5 h-5 text-yellow-400 mt-0.5"></i>
-                            <div>
-                                <h4 class="text-sm font-semibold text-yellow-200">Flow Stoppage</h4>
-                                <p class="text-xs text-yellow-300/70 mt-1">Crowd flow stopped at Corridor B for > 30s.</p>
-                                <span class="text-[10px] text-slate-500 mt-2 block">2 min ago</span>
-                            </div>
-                        </div>
-
-                        <!-- Alert Item -->
-                        <div class="flex gap-3 items-start p-3 rounded-lg bg-slate-800/50 border border-white/5">
-                            <i data-lucide="check-circle" class="w-5 h-5 text-green-400 mt-0.5"></i>
-                            <div>
-                                <h4 class="text-sm font-semibold text-slate-200">System Calibration</h4>
-                                <p class="text-xs text-slate-400 mt-1">YOLOv8 weights updated successfully.</p>
-                                <span class="text-[10px] text-slate-500 mt-2 block">10 min ago</span>
-                            </div>
-                        </div>
+                    
+                    <!-- DYNAMIC ALERTS CONTAINER -->
+                    <div id="alerts-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+                        <p class="text-slate-500 text-xs text-center mt-10">Loading alerts from secure database...</p>
                     </div>
                 </div>
             </div>
@@ -196,30 +179,123 @@
     <script>
         lucide.createIcons();
 
-        // Check Login Status on Load
+        // --- AUTHENTICATION CHECK ---
         try {
             const userStr = localStorage.getItem('crowdGuardUser');
             if (!userStr) {
-                // If no user is found, kick them back to login
-                // Fix: Use explicit relative path to avoid "Not a valid URL" error
-                window.location.href = './login.html';
+                // Not logged in -> Redirect to login
+                window.location.href = './index.html';
             } else {
                 const user = JSON.parse(userStr);
-                // Update UI with user details
                 document.getElementById('user-name-display').innerText = user.name || 'User';
                 document.getElementById('user-role-display').innerText = user.role || 'Guest';
             }
         } catch (e) {
-            console.error("Authentication Error:", e);
-            // Fallback redirect on error
-            window.location.href = './login.html';
+            console.error("Auth Error:", e);
+            window.location.href = './index.html';
         }
 
         function logout() {
             localStorage.removeItem('crowdGuardUser');
-            // Fix: Use explicit relative path
-            window.location.href = './login.html';
+            window.location.href = './index.html';
         }
+
+        // --- ALERT SYSTEM ---
+        const API_URL = 'http://localhost:5000/api';
+        const syncStatus = document.getElementById('sync-status');
+
+        async function loadAlerts() {
+            const container = document.getElementById('alerts-container');
+            
+            try {
+                console.log("Polling for alerts...");
+                const response = await fetch(`${API_URL}/alerts`);
+                const data = await response.json();
+
+                // Update Sync Status
+                syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500"></span> Synced: ${new Date().toLocaleTimeString()}`;
+
+                if (data.success && data.alerts.length > 0) {
+                    container.innerHTML = data.alerts.map(alert => createAlertHTML(alert)).join('');
+                    lucide.createIcons(); // Re-render icons
+                } else {
+                    container.innerHTML = '<p class="text-slate-500 text-xs text-center mt-10">No active alerts detected.</p>';
+                }
+            } catch (error) {
+                console.error("Error loading alerts:", error);
+                
+                // Update Sync Status to Error
+                syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> Connection Lost`;
+                
+                // Only show error message if container is empty or loading
+                if(container.innerHTML.includes("Loading")) {
+                    container.innerHTML = '<p class="text-red-400 text-xs text-center mt-10">System Offline: Could not fetch alerts.</p>';
+                }
+            }
+        }
+
+        function createAlertHTML(alert) {
+            let colors = {
+                high: 'text-red-400 bg-red-500/10 border-red-500/20',
+                medium: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
+                low: 'text-blue-400 bg-blue-500/10 border-blue-500/20'
+            };
+            
+            // Safe fallback for properties
+            const severity = alert.severity || 'low';
+            const type = alert.type || 'Unknown';
+            const message = alert.message || 'No details provided';
+            const sector = alert.sector || 'General';
+
+            let icon = severity === 'high' ? 'octagon-alert' : (severity === 'medium' ? 'footprints' : 'info');
+            let theme = colors[severity] || colors.low;
+            
+            let timeAgo = 'Just now';
+            if (alert.timestamp) {
+                timeAgo = new Date(alert.timestamp).toLocaleTimeString();
+            }
+
+            return `
+                <div class="flex gap-3 items-start p-3 rounded-lg border ${theme} transition hover:bg-opacity-20 animate-fade-in">
+                    <i data-lucide="${icon}" class="w-5 h-5 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <h4 class="text-sm font-semibold opacity-90">${type}</h4>
+                        <p class="text-xs opacity-70 mt-1">${message}</p>
+                        <span class="text-[10px] opacity-50 mt-2 block">${timeAgo} • ${sector}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- SIMULATOR ---
+        async function simulateAlert() {
+            const scenarios = [
+                { type: 'High Density', severity: 'high', msg: 'Crowd density exceeded 3.5 p/m².' },
+                { type: 'Stoppage', severity: 'medium', msg: 'Flow stoppage detected at Corridor B.' },
+                { type: 'Camera Offline', severity: 'low', msg: 'Signal lost from CAM-04 temporarily.' }
+            ];
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+
+            try {
+                await fetch(`${API_URL}/alerts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: scenario.type,
+                        sector: 'Sector ' + ['A','B','C'][Math.floor(Math.random()*3)],
+                        message: scenario.msg,
+                        severity: scenario.severity
+                    })
+                });
+                loadAlerts(); // Refresh immediately
+            } catch (e) { console.error(e); }
+        }
+
+        // Initialize
+        loadAlerts();
+        // Poll every 5 seconds
+        setInterval(loadAlerts, 5000);
+
     </script>
 </body>
 </html>
